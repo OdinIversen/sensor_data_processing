@@ -1,1 +1,10 @@
 # sensor_data_processing
+This project is made to process sensor data.
+
+## Add data
+To add data for processing, add it to the "data"-folder.
+
+### gitignore
+A ".gitignore" file is added to ignore the contents of the "data"-folder, so that the data is not uploaded.
+
+## Convert to monthly values
