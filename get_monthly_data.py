@@ -28,36 +28,36 @@ def reformat_data(data: pd.DataFrame) -> pd.DataFrame:
     
     return reformatted_data
 
-def get_daily_average(data: pd.DataFrame) -> pd.DataFrame:
+def get_daily_production(data: pd.DataFrame) -> pd.DataFrame:
     data['Date'] = data['Timestamp'].dt.date
     numeric_columns = data.select_dtypes(include='number').columns
-    daily_averages = data.groupby('Date')[numeric_columns].mean().reset_index()
-    return daily_averages
+    daily_data = data.groupby('Date')[numeric_columns].sum().reset_index()
+    return daily_data
 
-def get_daily_averages() -> pd.DataFrame:
-    daily_averages = pd.DataFrame()
+def get_daily_data() -> pd.DataFrame:
+    daily_data = pd.DataFrame()
     for file in os.listdir('data'):
         if file.endswith('4.csv'):
             try:
                 data = pd.read_csv(f'data/{file}', sep=';')
                 reformatted_data = reformat_data(data)
                 df_with_deltas = calculate_specific_deltas(reformatted_data)
-                daily_average = get_daily_average(df_with_deltas)
-                daily_averages = pd.concat([daily_averages, daily_average])
-            except Exception as e:
+                data = get_daily_production(df_with_deltas)
+                daily_data = pd.concat([daily_data, data])
+            except KeyError as e:
                 print(f"Error in file: {file}")
-    return daily_averages
+    return daily_data
 
-def get_monthly_averages() -> pd.DataFrame:
-    daily_averages = get_daily_averages()
-    daily_averages['Month'] = pd.to_datetime(daily_averages['Date']).dt.to_period('M')
-    numeric_columns = daily_averages.select_dtypes(include='number').columns.difference(['Date'])
-    monthly_averages = daily_averages.groupby('Month')[numeric_columns].mean().reset_index()
+def get_monthly_production() -> pd.DataFrame:
+    daily_data = get_daily_data()
+    daily_data['Month'] = pd.to_datetime(daily_data['Date']).dt.to_period('M')
+    numeric_columns = daily_data.select_dtypes(include='number').columns.difference(['Date'])
+    monthly_averages = daily_data.groupby('Month')[numeric_columns].sum().reset_index()
     return monthly_averages
 
 
 def main():
-    monthly_averages = get_monthly_averages()
+    monthly_averages = get_monthly_production()
     print(monthly_averages)
 
 
